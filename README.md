@@ -1,7 +1,7 @@
 # HomeLab Docker Compose for InfluxDB
 
 ## Preparation
-To prepare the deployment, make a copy of the .env.example file and override the default values to your need.
+To prepare the deployment, make a copy of the ```.env.example```  file to ```.env``` and override the default values to your need.
 Also, to deploy into a different directory than the following, modify ```playbook.yml```.
 
 ## Deployment
