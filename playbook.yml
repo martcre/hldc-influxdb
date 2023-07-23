@@ -1,0 +1,59 @@
+---
+- name: "HLDC-InfluxDB"
+  hosts: localhost
+  connection: local
+  vars:
+    - install_dir: /usr/local/etc/influxdb
+    - data_dir: /opt/influxdb/data
+    - config_dir: /opt/influxdb/config
+  tasks:
+
+  - name: "Print Vars"
+    debug:
+      msg:
+        - "install_dir = {{ install_dir }}"
+        - "data_dir = {{ data_dir }}"
+        - "config_dir = {{ config_dir }}"
+
+  - name: "Create directories"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+    loop:
+      - "{{ install_dir }}"
+      - "{{ data_dir }}"
+      - "{{ config_dir }}"
+
+  - name: "Tear down existing services"
+    community.docker.docker_compose:
+      project_src: "{{ install_dir }}"
+      state: absent
+    ignore_errors: true
+
+  - name: "Copy files"
+    copy:
+      src: "{{ item }}"
+      dest: "{{ install_dir }}/{{ item }}"
+    loop:
+      - docker-compose.yml
+      - .env
+      - README.md
+
+  - name: "Secure .env and .env.example files"
+    file:
+      path: "{{ install_dir }}/{{ item }}"
+      state: file
+      owner: root
+      group: root
+      mode: 0600
+    loop:
+      - .env
+    ignore_errors: true
+
+  - name: "Put up services"
+    community.docker.docker_compose:
+      project_src: "{{  install_dir }}"
+      state: present
